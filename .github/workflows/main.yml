@@ -1,0 +1,57 @@
+name: Build Android APK
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install Cordova
+      run: npm install -g cordova
+
+    - name: Create App Project
+      run: |
+        rm -rf myapp
+        cordova create myapp com.aiou.cgpacalculator "Aiou CGPA Calculator"
+        cd myapp
+        cordova platform add android
+        rm -rf www/*
+
+    - name: Apply Custom Icon and Files Safely
+      run: |
+        # Copy HTML file
+        cp index.html myapp/www/index.html
+        
+        # Copy Icon directly to Cordova Android resource folder to bypass its config bug
+        if [ -f "icon.png" ]; then
+          mkdir -p myapp/res/icon/android
+          cp icon.png myapp/res/icon/android/icon-mdpi.png
+          cp icon.png myapp/www/icon.png
+          
+          # Inject icon strictly with clean paths
+          sed -i '/<\/widget>/i \    <icon src="www/icon.png" />' myapp/config.xml
+          sed -i '/<\/widget>/i \    <preference name="AndroidWindowSplashScreenAnimatedIcon" value="www/icon.png" />' myapp/config.xml
+        fi
+
+    - name: Build Android APK
+      run: |
+        cd myapp
+        cordova build android --no-telemetry
+
+    - name: Upload Finished APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: my-android-app
+        path: myapp/platforms/android/app/build/outputs/apk/debug/app-debug.apk
