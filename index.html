@@ -1,0 +1,2089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#0a0a1a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>AzeemAiOUPrime - AIOU CGPA Calculator</title>
+    <!-- Font Awesome 6 (free) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet" />
+    <!-- html2canvas for image capture -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js">
+    </script>
+    <style>
+        /* ─────────────── ROOT VARIABLES ─────────────── */
+        :root {
+            --bg: #0a0a1a;
+            --card-bg: rgba(20, 30, 50, 0.8);
+            --accent-1: #00d4ff;
+            --accent-2: #a855f7;
+            --accent-3: #ec4899;
+            --accent-4: #f59e0b;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.06);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --radius: 16px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ─────────────── RESET ─────────────── */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ─────────────── SCROLLBAR ─────────────── */
+        ::-webkit-scrollbar {
+            width: 3px;
+            height: 3px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-1);
+            border-radius: 10px;
+        }
+
+        /* ─────────────── APP CONTAINER ─────────────── */
+        #app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ─────────────── TOP BAR (Status + Header) ─────────────── */
+        .status-bar {
+            padding: 4px 16px 0;
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: var(--text-muted);
+            opacity: 0.5;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+        }
+
+        .header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 14px 10px;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+            min-height: 56px;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+        .hamburger {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px 0;
+            transition: var(--transition);
+            width: 30px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .hamburger:hover {
+            color: var(--accent-1);
+        }
+        .brand-wrap {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.1;
+            min-width: 0;
+        }
+        .brand-glow {
+            font-family: 'Orbitron', 'Inter', sans-serif;
+            font-size: 18px;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            background: linear-gradient(135deg, #00d4ff 0%, #a855f7 40%, #ec4899 70%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 25px rgba(0, 212, 255, 0.25)) drop-shadow(0 0 50px rgba(168, 85, 247, 0.15));
+            animation: glowPulseText 3s ease-in-out infinite;
+            white-space: nowrap;
+        }
+        @keyframes glowPulseText {
+            0%,
+            100% {
+                filter: drop-shadow(0 0 25px rgba(0, 212, 255, 0.25)) drop-shadow(0 0 50px rgba(168, 85, 247, 0.15));
+            }
+            50% {
+                filter: drop-shadow(0 0 40px rgba(0, 212, 255, 0.4)) drop-shadow(0 0 70px rgba(168, 85, 247, 0.25)) drop-shadow(0 0 100px rgba(236, 72, 153, 0.15));
+            }
+        }
+        .brand-sub {
+            font-size: 9px;
+            color: var(--text-muted);
+            letter-spacing: 1.5px;
+            -webkit-text-fill-color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        .header-actions .phone-badge {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            padding: 3px 10px;
+            border-radius: 50px;
+            font-size: 10px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+        .header-actions .phone-badge i {
+            color: var(--accent-1);
+            font-size: 11px;
+        }
+        .header-actions .whatsapp-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(37, 211, 102, 0.12);
+            color: #25d366;
+            padding: 3px 10px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 10px;
+            border: 1px solid rgba(37, 211, 102, 0.15);
+            transition: var(--transition);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .header-actions .whatsapp-btn:hover {
+            background: rgba(37, 211, 102, 0.22);
+            box-shadow: 0 0 20px rgba(37, 211, 102, 0.15);
+        }
+
+        /* ─────────────── SIDEBAR ─────────────── */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 999;
+            backdrop-filter: blur(4px);
+        }
+        .sidebar-overlay.show {
+            display: block;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            background: rgba(10, 14, 28, 0.97);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-right: 1px solid var(--border);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateX(-100%);
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-bottom: 20px;
+        }
+        .sidebar.open {
+            transform: translateX(0);
+        }
+
+        .sidebar-brand {
+            padding: 20px 18px 14px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+        .sidebar-brand .logo-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            font-weight: 900;
+            color: #fff;
+            flex-shrink: 0;
+            box-shadow: 0 0 28px rgba(0, 212, 255, 0.2);
+        }
+        .sidebar-brand .brand-text .name {
+            font-size: 16px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2), var(--accent-3));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .sidebar-brand .brand-text .sub {
+            font-size: 9px;
+            color: var(--text-muted);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .sidebar-nav {
+            padding: 14px 10px;
+            flex: 1;
+            overflow-y: auto;
+        }
+        .sidebar-nav .nav-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            padding: 0 12px 8px;
+            opacity: 0.5;
+        }
+        .sidebar-nav .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 13px;
+            color: var(--text-muted);
+            transition: var(--transition);
+            margin-bottom: 2px;
+            text-decoration: none;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-family: inherit;
+            position: relative;
+        }
+        .sidebar-nav .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+        .sidebar-nav .nav-item.active {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.10), rgba(168, 85, 247, 0.10));
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .sidebar-nav .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 20%;
+            height: 60%;
+            width: 3px;
+            border-radius: 0 4px 4px 0;
+            background: linear-gradient(180deg, var(--accent-1), var(--accent-2));
+        }
+        .sidebar-nav .nav-item i {
+            width: 18px;
+            font-size: 15px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+        .sidebar-nav .nav-item.active i {
+            color: var(--accent-1);
+        }
+        .sidebar-nav .nav-item .badge {
+            margin-left: auto;
+            font-size: 9px;
+            background: rgba(0, 212, 255, 0.12);
+            color: var(--accent-1);
+            padding: 2px 10px;
+            border-radius: 50px;
+            font-weight: 600;
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 6px 14px;
+        }
+
+        .sidebar-footer {
+            padding: 10px 12px 0;
+            border-top: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .sidebar-footer .ft-label {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            padding: 0 12px 6px;
+            opacity: 0.5;
+        }
+        .sidebar-footer .ft-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-family: inherit;
+        }
+        .sidebar-footer .ft-link:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+        .sidebar-footer .ft-link i {
+            width: 16px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .sidebar-footer .ft-link:hover i {
+            color: var(--accent-1);
+        }
+        .sidebar-footer .contact-email {
+            font-size: 11px;
+            padding: 2px 12px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .sidebar-footer .contact-email i {
+            font-size: 11px;
+            width: 16px;
+        }
+        .sidebar-footer .whatsapp-ft {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 7px 14px;
+            margin-top: 4px;
+            border-radius: 10px;
+            background: rgba(37, 211, 102, 0.10);
+            border: 1px solid rgba(37, 211, 102, 0.15);
+            color: #25d366;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .sidebar-footer .whatsapp-ft:hover {
+            background: rgba(37, 211, 102, 0.18);
+            border-color: rgba(37, 211, 102, 0.3);
+        }
+
+        /* ─────────────── MAIN CONTENT ─────────────── */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 12px 16px 30px;
+            background:
+                radial-gradient(ellipse at 10% 20%, rgba(0, 212, 255, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 90% 80%, rgba(168, 85, 247, 0.03) 0%, transparent 50%);
+            -webkit-overflow-scrolling: touch;
+            /* smooth scroll on iOS */
+        }
+
+        .page-section {
+            display: none;
+            animation: fadeSlideUp 0.35s ease;
+            padding-bottom: 10px;
+        }
+        .page-section.active {
+            display: block;
+        }
+
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ─────────────── DASHBOARD ─────────────── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px 12px;
+            text-align: center;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+            opacity: 0.5;
+        }
+        .stat-card:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 32px rgba(0, 0, 0, 0.3);
+        }
+        .stat-card .stat-icon {
+            font-size: 20px;
+            margin-bottom: 2px;
+            display: block;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .stat-card .stat-number {
+            font-size: 20px;
+            font-weight: 800;
+            color: #fff;
+        }
+        .stat-card .stat-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 1px;
+        }
+
+        .dash-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-top: 4px;
+        }
+        .dash-action {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px 14px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .dash-action::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            border-radius: 0 0 var(--radius) var(--radius);
+            transition: var(--transition);
+            opacity: 0;
+        }
+        .dash-action:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255, 255, 255, 0.18);
+            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.3);
+        }
+        .dash-action .dash-icon {
+            font-size: 24px;
+            display: block;
+            margin-bottom: 3px;
+            color: #fff;
+        }
+        .dash-action .dash-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+        }
+        .dash-action .dash-desc {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .dash-action.action-blue::after {
+            background: var(--accent-1);
+            opacity: 1;
+        }
+        .dash-action.action-blue:hover {
+            box-shadow: 0 14px 40px rgba(0, 212, 255, 0.10);
+        }
+        .dash-action.action-purple::after {
+            background: var(--accent-2);
+            opacity: 1;
+        }
+        .dash-action.action-purple:hover {
+            box-shadow: 0 14px 40px rgba(168, 85, 247, 0.10);
+        }
+        .dash-action.action-gold::after {
+            background: var(--accent-4);
+            opacity: 1;
+        }
+        .dash-action.action-gold:hover {
+            box-shadow: 0 14px 40px rgba(245, 158, 11, 0.10);
+        }
+
+        .quick-info {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 16px 18px;
+            border: 1px solid var(--border);
+        }
+        @media (max-width: 480px) {
+            .quick-info {
+                grid-template-columns: 1fr;
+                padding: 14px 14px;
+            }
+        }
+        .quick-info .qi-label {
+            font-size: 9px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .quick-info .qi-label i {
+            color: var(--accent-1);
+            font-size: 11px;
+        }
+        .quick-info .qi-links {
+            margin-top: 5px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            font-size: 11px;
+        }
+        .quick-info .qi-links a {
+            color: var(--accent-1);
+            text-decoration: none;
+            transition: color var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .quick-info .qi-links a:hover {
+            color: #fff;
+        }
+        .quick-info .qi-emails {
+            margin-top: 5px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+        .quick-info .qi-emails span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .quick-info .qi-emails i {
+            color: var(--accent-1);
+            width: 14px;
+            font-size: 10px;
+        }
+
+        /* ─────────────── CARDS (forms) ─────────────── */
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px 16px;
+            margin-bottom: 16px;
+            transition: var(--transition);
+        }
+        .card:hover {
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+        .card h2 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #fff, var(--text-muted));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.04);
+            color: #fff;
+            border: 1px solid var(--border);
+            padding: 5px 14px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 11px;
+            transition: var(--transition);
+            margin-bottom: 10px;
+            font-family: inherit;
+        }
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* ─────────────── FORM ELEMENTS ─────────────── */
+        .input-group {
+            margin-bottom: 10px;
+        }
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 3px;
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 9px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.04);
+            color: #fff;
+            font-size: 13px;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: var(--accent-1);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.06);
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .input-group input::placeholder {
+            color: var(--text-muted);
+            opacity: 0.4;
+        }
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        @media (max-width: 500px) {
+            .input-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .btn {
+            padding: 9px 18px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 12px;
+            transition: var(--transition);
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #1a56db, #7c3aed);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(124, 58, 237, 0.25);
+            width: 100%;
+        }
+        .btn-primary:hover {
+            box-shadow: 0 8px 30px rgba(124, 58, 237, 0.4);
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.10);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.25);
+            width: 100%;
+        }
+        .btn-success:hover {
+            box-shadow: 0 8px 30px rgba(16, 185, 129, 0.4);
+            transform: translateY(-2px);
+        }
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.12);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.15);
+            padding: 3px 10px;
+            font-size: 10px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.22);
+        }
+        .btn-print,
+        .btn-save-image {
+            padding: 10px 18px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 12px;
+            transition: var(--transition);
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex: 1;
+            min-width: 80px;
+        }
+        .btn-print {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.25);
+        }
+        .btn-print:hover {
+            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
+            transform: translateY(-2px);
+        }
+        .btn-save-image {
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.25);
+        }
+        .btn-save-image:hover {
+            box-shadow: 0 8px 30px rgba(16, 185, 129, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* ─────────────── SUBJECT ENTRY ─────────────── */
+        .subject-entry {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 8px;
+            transition: var(--transition);
+        }
+        .subject-entry:hover {
+            border-color: rgba(255, 255, 255, 0.10);
+        }
+        .subject-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .subject-number {
+            font-weight: 700;
+            color: var(--accent-1);
+            font-size: 11px;
+        }
+
+        /* ─────────────── SEMESTER TABS ─────────────── */
+        .semester-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-bottom: 12px;
+            justify-content: center;
+        }
+        .semester-tab {
+            padding: 5px 12px;
+            border-radius: 50px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text-muted);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 10px;
+            transition: var(--transition);
+        }
+        .semester-tab.active {
+            background: linear-gradient(135deg, #1a56db, #7c3aed);
+            border-color: transparent;
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(124, 58, 237, 0.25);
+        }
+        .semester-tab:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        .semester-content {
+            display: none;
+        }
+        .semester-content.active {
+            display: block;
+            animation: fadeSlideUp 0.3s ease;
+        }
+
+        /* ─────────────── RESULT CARD (Certificate style) ─────────────── */
+        .result-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 24px 22px;
+            position: relative;
+            overflow: hidden;
+            margin-top: 14px;
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.05), inset 0 0 60px rgba(0, 212, 255, 0.02);
+        }
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 22px;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2), var(--accent-3));
+            z-index: -1;
+            opacity: 0.2;
+        }
+        .result-card .certificate-border {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            right: 6px;
+            bottom: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            pointer-events: none;
+        }
+        .result-card .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-18deg) scale(1.2);
+            font-family: 'Orbitron', 'Inter', sans-serif;
+            font-size: 44px;
+            font-weight: 900;
+            letter-spacing: 6px;
+            white-space: nowrap;
+            background: linear-gradient(135deg, #00d4ff, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            opacity: 0.06;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .result-card .result-content {
+            position: relative;
+            z-index: 1;
+        }
+        .result-header {
+            text-align: center;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.06);
+            padding-bottom: 14px;
+            margin-bottom: 16px;
+        }
+        .result-header .uni-name {
+            font-size: 18px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: 1px;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
+        }
+        .result-header .uni-name i {
+            color: var(--accent-1);
+            margin-right: 6px;
+        }
+        .result-header .brand-sub {
+            font-size: 13px;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2), var(--accent-3));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-top: 4px;
+            font-family: 'Orbitron', 'Inter', sans-serif;
+            letter-spacing: 1px;
+        }
+        .result-header .result-type {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .result-student {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        .result-student .student-name {
+            font-size: 20px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: 0.5px;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.08);
+        }
+        .result-student .student-program {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 4px;
+        }
+        @media (max-width: 500px) {
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .result-item {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 12px 8px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(4px);
+        }
+        .result-item .label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 4px;
+        }
+        .result-item .value {
+            font-size: 24px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .result-item .value.gold {
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .result-item .value.green {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .grade-badge {
+            display: inline-block;
+            padding: 10px 32px;
+            border-radius: 50px;
+            font-size: 32px;
+            font-weight: 900;
+            margin: 12px 0 6px;
+            animation: glowPulse 2s ease-in-out infinite;
+            letter-spacing: 2px;
+        }
+        .grade-badge.grade-a {
+            background: linear-gradient(135deg, #10b981, #059669);
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
+        }
+        .grade-badge.grade-b {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.4);
+        }
+        .grade-badge.grade-c {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            box-shadow: 0 0 30px rgba(245, 158, 11, 0.4);
+        }
+        .grade-badge.grade-d {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
+        }
+        .grade-badge.grade-f {
+            background: linear-gradient(135deg, #6b7280, #4b5563);
+            box-shadow: 0 0 30px rgba(107, 114, 128, 0.4);
+        }
+        @keyframes glowPulse {
+            0%,
+            100% {
+                box-shadow: 0 0 30px rgba(16, 185, 129, 0.35);
+            }
+            50% {
+                box-shadow: 0 0 50px rgba(16, 185, 129, 0.7);
+            }
+        }
+
+        .watermark-footer {
+            text-align: center;
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        .watermark-footer .wm-brand {
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2), var(--accent-3));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-family: 'Orbitron', 'Inter', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+        .action-buttons .btn {
+            flex: 1;
+            min-width: 80px;
+        }
+
+        /* ─────────────── TOAST ─────────────── */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(16, 185, 129, 0.92);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            z-index: 9999;
+            box-shadow: 0 10px 32px rgba(0, 0, 0, 0.4);
+            animation: slideUp 0.35s ease, fadeOut 0.4s ease 2.4s forwards;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            font-size: 12px;
+            white-space: nowrap;
+            max-width: 90%;
+            text-align: center;
+        }
+        .toast.error {
+            background: rgba(239, 68, 68, 0.92);
+        }
+        @keyframes slideUp {
+            from {
+                transform: translateX(-50%) translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-10px);
+            }
+        }
+
+        /* ─────────────── RESPONSIVE ─────────────── */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 10px 12px 20px;
+            }
+            .brand-glow {
+                font-size: 15px;
+            }
+            .brand-sub {
+                font-size: 8px;
+            }
+            .header-actions .phone-badge {
+                font-size: 9px;
+                padding: 2px 8px;
+            }
+            .header-actions .whatsapp-btn {
+                font-size: 9px;
+                padding: 2px 8px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .dash-actions {
+                grid-template-columns: 1fr;
+            }
+            .quick-info {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 480px) {
+            .brand-glow {
+                font-size: 13px;
+                letter-spacing: 0.3px;
+            }
+            .brand-sub {
+                font-size: 7px;
+                letter-spacing: 1px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+            .stat-card .stat-number {
+                font-size: 17px;
+            }
+            .stat-card {
+                padding: 10px 8px;
+            }
+            .card {
+                padding: 12px 10px;
+            }
+            .result-card {
+                padding: 14px 12px;
+            }
+            .header-actions .phone-badge {
+                display: none;
+            }
+            .header-actions .whatsapp-btn {
+                font-size: 8px;
+                padding: 2px 6px;
+            }
+            .header-bar {
+                padding: 4px 10px 8px;
+                min-height: 48px;
+            }
+            .hamburger {
+                font-size: 18px;
+                width: 26px;
+            }
+            .result-header .uni-name {
+                font-size: 15px;
+            }
+            .result-header .brand-sub {
+                font-size: 11px;
+            }
+            .result-item .value {
+                font-size: 20px;
+            }
+            .grade-badge {
+                font-size: 26px;
+                padding: 6px 20px;
+            }
+        }
+
+        /* ─────────────── PRINT (for print button) ─────────────── */
+        @media print {
+            .sidebar,
+            .header-actions,
+            .hamburger,
+            .back-btn,
+            .action-buttons,
+            .sidebar-overlay,
+            .status-bar {
+                display: none !important;
+            }
+            .main-content {
+                padding: 12px !important;
+                background: #fff !important;
+                overflow: visible !important;
+                height: auto !important;
+            }
+            .result-card {
+                border: 2px solid #1a56db !important;
+                background: #fff !important;
+                color: #000 !important;
+                page-break-inside: avoid;
+                box-shadow: none !important;
+            }
+            .result-card .watermark {
+                opacity: 0.06 !important;
+                -webkit-text-fill-color: #1a56db !important;
+                background: none !important;
+                color: #1a56db !important;
+            }
+            .result-card::before {
+                display: none !important;
+            }
+            .grade-badge {
+                border: 2px solid #000 !important;
+                box-shadow: none !important;
+                background: #f0f0f0 !important;
+                color: #000 !important;
+                -webkit-text-fill-color: #000 !important;
+            }
+            .result-item .value,
+            .result-item .value.gold,
+            .result-item .value.green {
+                -webkit-text-fill-color: #1a56db !important;
+                color: #1a56db !important;
+                background: none !important;
+            }
+            .result-header .uni-name {
+                color: #000 !important;
+            }
+            .result-header .brand-sub {
+                -webkit-text-fill-color: #1a56db !important;
+                color: #1a56db !important;
+                background: none !important;
+            }
+            .watermark-footer {
+                color: #555 !important;
+            }
+            .watermark-footer .wm-brand {
+                -webkit-text-fill-color: #1a56db !important;
+                color: #1a56db !important;
+                background: none !important;
+            }
+            .card {
+                background: #fff !important;
+                border: 1px solid #ddd !important;
+                color: #000 !important;
+            }
+            .card h2 {
+                -webkit-text-fill-color: #000 !important;
+                color: #000 !important;
+            }
+            .stat-card {
+                background: #f9f9f9 !important;
+                border: 1px solid #ddd !important;
+            }
+            .stat-card .stat-number {
+                color: #000 !important;
+            }
+            .stat-card .stat-icon {
+                -webkit-text-fill-color: #1a56db !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app">
+
+        <!-- ─── SIDEBAR OVERLAY ─── -->
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+        <!-- ─── SIDEBAR ─── -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="logo-icon">AZ</div>
+                <div class="brand-text">
+                    <span class="name">AzeemAiOUPrime</span>
+                    <span class="sub">CGPA Calculator</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-label">Main</div>
+                <button class="nav-item active" data-page="dashboard" onclick="navigateTo('dashboard')">
+                    <i class="fas fa-th-large"></i> Dashboard
+                </button>
+                <button class="nav-item" data-page="semester" onclick="navigateTo('semester')">
+                    <i class="fas fa-book-open"></i> Semester Wise
+                    <span class="badge">8</span>
+                </button>
+                <button class="nav-item" data-page="overall" onclick="navigateTo('overall')">
+                    <i class="fas fa-chart-simple"></i> Overall Total
+                </button>
+                <button class="nav-item" data-page="credits" onclick="navigateTo('credits')">
+                    <i class="fas fa-weight-scale"></i> Credit Hours
+                </button>
+
+                <div class="sidebar-divider"></div>
+                <div class="nav-label">Quick Links</div>
+                <a class="nav-item" href="https://www.aiou.edu.pk/Books%20Soft.asp" target="_blank">
+                    <i class="fas fa-book"></i> Download Books
+                </a>
+                <a class="nav-item" href="https://www.aiou.edu.pk/workshop-information" target="_blank">
+                    <i class="fas fa-users"></i> Workshop Info
+                </a>
+                <a class="nav-item" href="https://enrollment.aiou.edu.pk" target="_blank">
+                    <i class="fas fa-user-graduate"></i> CMS
+                </a>
+                <a class="nav-item" href="https://aaghi.aiou.edu.pk" target="_blank">
+                    <i class="fas fa-cloud"></i> LMS
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="ft-label">Contact &amp; Support</div>
+                <button class="ft-link" onclick="copyEmail('adms@aiou.edu.pk')">
+                    <i class="fas fa-envelope"></i> Admission: adms@aiou.edu.pk
+                </button>
+                <button class="ft-link" onclick="copyEmail('sfc@aiou.edu.pk')">
+                    <i class="fas fa-envelope"></i> Student Advisory: sfc@aiou.edu.pk
+                </button>
+                <button class="ft-link" onclick="copyEmail('tr_drs@aiou.edu.pk')">
+                    <i class="fas fa-envelope"></i> Tutor Registration: tr_drs@aiou.edu.pk
+                </button>
+                <div class="sidebar-divider" style="margin:4px 0;"></div>
+                <div class="contact-email">
+                    <i class="fas fa-phone"></i> 0334-1967215
+                </div>
+                <a class="whatsapp-ft" href="https://whatsapp.com/channel/0029Vb7WO0AEgGfPnrCYk624" target="_blank">
+                    <i class="fab fa-whatsapp"></i> Join WhatsApp Channel
+                </a>
+            </div>
+        </aside>
+
+        <!-- ─── TOP BAR ─── -->
+        <div class="status-bar">
+            <span>AzeemAiOUPrime</span>
+            <span>v2.0</span>
+        </div>
+        <header class="header-bar">
+            <div class="header-left">
+                <button class="hamburger" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="brand-wrap">
+                    <span class="brand-glow">AzeemAiOUPrime</span>
+                    <span class="brand-sub">✦ AIOU CGPA Calculator ✦</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <span class="phone-badge"><i class="fas fa-phone"></i> 0334-1967215</span>
+                <a class="whatsapp-btn" href="https://whatsapp.com/channel/0029Vb7WO0AEgGfPnrCYk624" target="_blank">
+                    <i class="fab fa-whatsapp"></i> Channel
+                </a>
+            </div>
+        </header>
+
+        <!-- ─── MAIN CONTENT (SCROLLABLE) ─── -->
+        <div class="main-content" id="mainContent">
+
+            <!-- ─── DASHBOARD ─── -->
+            <section class="page-section active" id="page-dashboard">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-icon"><i class="fas fa-graduation-cap"></i></span>
+                        <div class="stat-number">8</div>
+                        <div class="stat-label">Semesters</div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-icon"><i class="fas fa-calculator"></i></span>
+                        <div class="stat-number">3</div>
+                        <div class="stat-label">Modes</div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-icon"><i class="fas fa-file-pdf"></i></span>
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">Print Ready</div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-icon"><i class="fas fa-university"></i></span>
+                        <div class="stat-number">AIOU</div>
+                        <div class="stat-label">Est. 1974</div>
+                    </div>
+                </div>
+
+                <div class="dash-actions">
+                    <div class="dash-action action-blue" onclick="navigateTo('semester')">
+                        <span class="dash-icon"><i class="fas fa-book-open"></i></span>
+                        <div class="dash-title">Semester Wise</div>
+                        <div class="dash-desc">8 Semesters • Subject-wise GPA</div>
+                    </div>
+                    <div class="dash-action action-purple" onclick="navigateTo('overall')">
+                        <span class="dash-icon"><i class="fas fa-chart-simple"></i></span>
+                        <div class="dash-title">Overall Total</div>
+                        <div class="dash-desc">Complete Program Result</div>
+                    </div>
+                    <div class="dash-action action-gold" onclick="navigateTo('credits')">
+                        <span class="dash-icon"><i class="fas fa-weight-scale"></i></span>
+                        <div class="dash-title">Credit Hours Wise</div>
+                        <div class="dash-desc">Weighted CGPA System</div>
+                    </div>
+                </div>
+
+                <div class="quick-info">
+                    <div>
+                        <div class="qi-label"><i class="fas fa-link"></i> Important Links</div>
+                        <div class="qi-links">
+                            <a href="https://www.aiou.edu.pk/Books%20Soft.asp" target="_blank"><i class="fas fa-book"></i> Download Books</a>
+                            <a href="https://www.aiou.edu.pk/workshop-information" target="_blank"><i class="fas fa-users"></i> Workshop Info</a>
+                            <a href="https://enrollment.aiou.edu.pk" target="_blank"><i class="fas fa-user-graduate"></i> CMS</a>
+                            <a href="https://aaghi.aiou.edu.pk" target="_blank"><i class="fas fa-cloud"></i> LMS</a>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="qi-label"><i class="fas fa-envelope"></i> Contact Emails</div>
+                        <div class="qi-emails">
+                            <span><i class="fas fa-envelope"></i> adms@aiou.edu.pk</span>
+                            <span><i class="fas fa-envelope"></i> sfc@aiou.edu.pk</span>
+                            <span><i class="fas fa-envelope"></i> tr_drs@aiou.edu.pk</span>
+                            <span style="margin-top:3px; color:var(--accent-3);"><i class="fas fa-phone"></i> 0334-1967215</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ─── SEMESTER WISE ─── -->
+            <section class="page-section" id="page-semester">
+                <button class="back-btn" onclick="navigateTo('dashboard')"><i class="fas fa-arrow-left"></i> Dashboard</button>
+                <div class="card">
+                    <h2><i class="fas fa-book-open" style="color:var(--accent-1);"></i> Semester Wise Calculator</h2>
+                    <div class="semester-tabs" id="semesterTabs"></div>
+                    <div id="semesterContents"></div>
+                    <button class="btn btn-success" onclick="calculateAllSemesters()"><i class="fas fa-calculator"></i> Calculate CGPA (All Semesters)</button>
+                </div>
+                <div id="semesterResultContainer"></div>
+            </section>
+
+            <!-- ─── OVERALL TOTAL ─── -->
+            <section class="page-section" id="page-overall">
+                <button class="back-btn" onclick="navigateTo('dashboard')"><i class="fas fa-arrow-left"></i> Dashboard</button>
+                <div class="card">
+                    <h2><i class="fas fa-chart-simple" style="color:var(--accent-2);"></i> Overall Total Calculator</h2>
+                    <div class="input-group">
+                        <label>Program Name</label>
+                        <input type="text" id="overallProgram" placeholder="e.g., BS Computer Science" />
+                    </div>
+                    <div class="input-group">
+                        <label>Student Name</label>
+                        <input type="text" id="overallName" placeholder="Enter your name" />
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>Total Marks</label>
+                            <input type="number" id="overallTotalMarks" placeholder="e.g., 4400" />
+                        </div>
+                        <div class="input-group">
+                            <label>Obtain Marks</label>
+                            <input type="number" id="overallObtainMarks" placeholder="e.g., 3500" />
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="calculateOverall()"><i class="fas fa-calculator"></i> Calculate Result</button>
+                </div>
+                <div id="overallResultContainer"></div>
+            </section>
+
+            <!-- ─── CREDIT HOURS ─── -->
+            <section class="page-section" id="page-credits">
+                <button class="back-btn" onclick="navigateTo('dashboard')"><i class="fas fa-arrow-left"></i> Dashboard</button>
+                <div class="card">
+                    <h2><i class="fas fa-weight-scale" style="color:var(--accent-4);"></i> Credit Hours Wise CGPA</h2>
+                    <div class="input-group">
+                        <label>Student Name</label>
+                        <input type="text" id="chName" placeholder="Enter your name" />
+                    </div>
+                    <div class="input-group">
+                        <label>Program Name</label>
+                        <input type="text" id="chProgram" placeholder="e.g., BS Computer Science" />
+                    </div>
+                    <div id="creditSubjectsContainer"></div>
+                    <button class="btn btn-secondary" onclick="addCreditSubject()" style="width:auto; padding:5px 16px; margin-bottom:8px; font-size:11px;"><i class="fas fa-plus"></i> Add Subject</button>
+                    <button class="btn btn-success" onclick="calculateCreditHours()"><i class="fas fa-calculator"></i> Calculate Weighted CGPA</button>
+                </div>
+                <div id="creditResultContainer"></div>
+            </section>
+
+        </div><!-- /main-content -->
+
+    </div><!-- /app -->
+
+    <!-- ─── TOAST ─── -->
+    <div id="toastContainer"></div>
+
+    <script>
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  GLOBALS
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        const totalSemesters = 8;
+        let semesterData = {};
+        let creditSubjectsCount = 0;
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  NAVIGATION
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        function navigateTo(page) {
+            document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+            const target = document.getElementById('page-' + page);
+            if (target) target.classList.add('active');
+
+            document.querySelectorAll('.sidebar-nav .nav-item').forEach(el => el.classList.remove('active'));
+            const navItem = document.querySelector(`.sidebar-nav .nav-item[data-page="${page}"]`);
+            if (navItem) navItem.classList.add('active');
+
+            closeSidebar();
+
+            if (page === 'semester') buildSemesterUI();
+            if (page === 'credits') initCreditSubjects();
+
+            // Clear results when navigating
+            document.getElementById('semesterResultContainer').innerHTML = '';
+            document.getElementById('overallResultContainer').innerHTML = '';
+            document.getElementById('creditResultContainer').innerHTML = '';
+
+            // Scroll to top of main content when navigating
+            document.getElementById('mainContent').scrollTop = 0;
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('show');
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('show');
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  TOAST
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        function showToast(message, isError = false) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast' + (isError ? ' error' : '');
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 2600);
+        }
+
+        function copyEmail(email) {
+            navigator.clipboard?.writeText(email).then(() => {
+                showToast('📧 Email copied: ' + email);
+            }).catch(() => {
+                showToast('📧 ' + email);
+            });
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  GRADING
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        function getGrade(pct) {
+            if (pct >= 85) return { grade: 'A', gpa: 4.0, letter: 'A' };
+            if (pct >= 80) return { grade: 'A-', gpa: 3.7, letter: 'A-' };
+            if (pct >= 75) return { grade: 'B+', gpa: 3.3, letter: 'B+' };
+            if (pct >= 70) return { grade: 'B', gpa: 3.0, letter: 'B' };
+            if (pct >= 65) return { grade: 'B-', gpa: 2.7, letter: 'B-' };
+            if (pct >= 60) return { grade: 'C+', gpa: 2.3, letter: 'C+' };
+            if (pct >= 55) return { grade: 'C', gpa: 2.0, letter: 'C' };
+            if (pct >= 52) return { grade: 'C-', gpa: 1.7, letter: 'C-' };
+            if (pct >= 50) return { grade: 'D', gpa: 1.0, letter: 'D' };
+            return { grade: 'F', gpa: 0.0, letter: 'F' };
+        }
+
+        function getGradeClass(letter) {
+            if (letter === 'A' || letter === 'A-') return 'grade-a';
+            if (letter === 'B+' || letter === 'B' || letter === 'B-') return 'grade-b';
+            if (letter === 'C+' || letter === 'C' || letter === 'C-') return 'grade-c';
+            if (letter === 'D') return 'grade-d';
+            return 'grade-f';
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  SEMESTER UI
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        function buildSemesterUI() {
+            const tabs = document.getElementById('semesterTabs');
+            tabs.innerHTML = '';
+            for (let i = 1; i <= totalSemesters; i++) {
+                const tab = document.createElement('button');
+                tab.className = 'semester-tab' + (i === 1 ? ' active' : '');
+                tab.textContent = 'Sem ' + i;
+                tab.onclick = () => switchSemesterTab(i);
+                tabs.appendChild(tab);
+            }
+
+            const container = document.getElementById('semesterContents');
+            container.innerHTML = '';
+            for (let i = 1; i <= totalSemesters; i++) {
+                const content = document.createElement('div');
+                content.className = 'semester-content' + (i === 1 ? ' active' : '');
+                content.id = 'semesterContent' + i;
+                content.innerHTML = `
+                    <h3 style="text-align:center;margin-bottom:10px;color:var(--accent-1);font-size:14px;">Semester ${i} Subjects</h3>
+                    <div id="semesterSubjects${i}">
+                        <div class="subject-entry">
+                            <div class="subject-header"><span class="subject-number">Subject 1</span></div>
+                            <div class="input-row">
+                                <div class="input-group"><label>Total Marks</label><input type="number" class="sem-total" data-sem="${i}" placeholder="e.g., 100" /></div>
+                                <div class="input-group"><label>Obtain Marks</label><input type="number" class="sem-obtain" data-sem="${i}" placeholder="e.g., 85" /></div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary" onclick="addSemesterSubject(${i})" style="width:auto;padding:4px 14px;margin-top:4px;font-size:11px;"><i class="fas fa-plus"></i> Add Subject</button>
+                    <button class="btn btn-primary" onclick="calculateSingleSemester(${i})" style="width:auto;padding:6px 18px;margin-top:6px;font-size:11px;"><i class="fas fa-calculator"></i> Calculate Sem ${i} GPA</button>
+                    <div id="singleSemResult${i}" style="margin-top:8px;"></div>
+                `;
+                container.appendChild(content);
+            }
+        }
+
+        function switchSemesterTab(num) {
+            document.querySelectorAll('.semester-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.semester-content').forEach(c => c.classList.remove('active'));
+            const tabs = document.querySelectorAll('.semester-tab');
+            if (tabs[num - 1]) tabs[num - 1].classList.add('active');
+            const content = document.getElementById('semesterContent' + num);
+            if (content) content.classList.add('active');
+        }
+
+        function addSemesterSubject(num) {
+            const container = document.getElementById('semesterSubjects' + num);
+            const count = container.querySelectorAll('.subject-entry').length + 1;
+            const entry = document.createElement('div');
+            entry.className = 'subject-entry';
+            entry.innerHTML = `
+                <div class="subject-header">
+                    <span class="subject-number">Subject ${count}</span>
+                    <button class="btn-danger" onclick="this.parentElement.parentElement.remove()"><i class="fas fa-times"></i> Remove</button>
+                </div>
+                <div class="input-row">
+                    <div class="input-group"><label>Total Marks</label><input type="number" class="sem-total" data-sem="${num}" placeholder="e.g., 100" /></div>
+                    <div class="input-group"><label>Obtain Marks</label><input type="number" class="sem-obtain" data-sem="${num}" placeholder="e.g., 85" /></div>
+                </div>
+            `;
+            container.appendChild(entry);
+        }
+
+        function calculateSingleSemester(num) {
+            const totals = document.querySelectorAll(`.sem-total[data-sem="${num}"]`);
+            const obtains = document.querySelectorAll(`.sem-obtain[data-sem="${num}"]`);
+            let subjects = [],
+                gTotal = 0,
+                gObtain = 0;
+
+            for (let i = 0; i < totals.length; i++) {
+                const t = parseFloat(totals[i].value);
+                const o = parseFloat(obtains[i].value);
+                if (!isNaN(t) && !isNaN(o) && t > 0) {
+                    const pct = (o / t) * 100;
+                    const info = getGrade(pct);
+                    subjects.push({ total: t, obtain: o, pct, ...info });
+                    gTotal += t;
+                    gObtain += o;
+                }
+            }
+
+            if (subjects.length === 0) {
+                showToast('⚠️ Please enter at least one subject!', true);
+                return;
+            }
+
+            const avgGPA = subjects.reduce((s, sub) => s + sub.gpa, 0) / subjects.length;
+            const overallPct = (gObtain / gTotal) * 100;
+            const overallGrade = getGrade(overallPct);
+            semesterData[num] = subjects;
+
+            const div = document.getElementById('singleSemResult' + num);
+            div.innerHTML = `
+                <div style="background:rgba(255,255,255,0.02);border-radius:10px;padding:12px;border:1px solid var(--border);text-align:center;">
+                    <div style="font-size:10px;color:var(--text-muted);">Semester ${num} GPA</div>
+                    <div style="font-size:26px;font-weight:900;background:linear-gradient(135deg,var(--accent-1),var(--accent-2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">${avgGPA.toFixed(2)}</div>
+                    <div class="grade-badge ${getGradeClass(overallGrade.letter)}" style="font-size:15px;padding:4px 16px;">${overallGrade.letter}</div>
+                    <div style="color:var(--text-muted);font-size:11px;">${overallPct.toFixed(2)}% • ${subjects.length} Subjects</div>
+                </div>
+            `;
+            showToast('✅ Semester ' + num + ' GPA: ' + avgGPA.toFixed(2));
+        }
+
+        function calculateAllSemesters() {
+            let allGPAs = [],
+                allSubjects = [],
+                gTotal = 0,
+                gObtain = 0;
+
+            for (let i = 1; i <= totalSemesters; i++) {
+                const totals = document.querySelectorAll(`.sem-total[data-sem="${i}"]`);
+                const obtains = document.querySelectorAll(`.sem-obtain[data-sem="${i}"]`);
+                let subs = [],
+                    sTotal = 0,
+                    sObtain = 0;
+
+                for (let j = 0; j < totals.length; j++) {
+                    const t = parseFloat(totals[j].value);
+                    const o = parseFloat(obtains[j].value);
+                    if (!isNaN(t) && !isNaN(o) && t > 0) {
+                        const pct = (o / t) * 100;
+                        const info = getGrade(pct);
+                        subs.push({ total: t, obtain: o, pct, ...info });
+                        sTotal += t;
+                        sObtain += o;
+                    }
+                }
+
+                if (subs.length > 0) {
+                    const semGPA = subs.reduce((s, sub) => s + sub.gpa, 0) / subs.length;
+                    allGPAs.push(semGPA);
+                    allSubjects.push(...subs);
+                    gTotal += sTotal;
+                    gObtain += sObtain;
+                    semesterData[i] = subs;
+                }
+            }
+
+            if (allGPAs.length === 0) {
+                showToast('⚠️ Please fill at least one semester!', true);
+                return;
+            }
+
+            const cgpa = allGPAs.reduce((s, g) => s + g, 0) / allGPAs.length;
+            const overallPct = gTotal > 0 ? (gObtain / gTotal) * 100 : 0;
+            const overallGrade = getGrade(overallPct);
+
+            const name = prompt('Enter Student Name:', 'Student') || 'Student';
+            const prog = prompt('Enter Program Name:', 'BS Program') || 'BS Program';
+
+            displayResult({
+                studentName: name,
+                programName: prog,
+                cgpa,
+                percentage: overallPct,
+                grade: overallGrade,
+                totalMarks: gTotal,
+                obtainMarks: gObtain,
+                totalSubjects: allSubjects.length,
+                semestersCount: allGPAs.length,
+                type: 'Semester Wise CGPA'
+            }, 'semesterResultContainer');
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  OVERALL
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        function calculateOverall() {
+            const prog = document.getElementById('overallProgram').value || 'BS Program';
+            const name = document.getElementById('overallName').value || 'Student';
+            const total = parseFloat(document.getElementById('overallTotalMarks').value);
+            const obtain = parseFloat(document.getElementById('overallObtainMarks').value);
+
+            if (isNaN(total) || isNaN(obtain) || total <= 0) {
+                showToast('⚠️ Please enter valid marks!', true);
+                return;
+            }
+            if (obtain > total) {
+                showToast('⚠️ Obtain marks cannot exceed total!', true);
+                return;
+            }
+
+            const pct = (obtain / total) * 100;
+            const gradeInfo = getGrade(pct);
+
+            displayResult({
+                studentName: name,
+                programName: prog,
+                cgpa: gradeInfo.gpa,
+                percentage: pct,
+                grade: gradeInfo,
+                totalMarks: total,
+                obtainMarks: obtain,
+                totalSubjects: 'N/A',
+                semestersCount: 'N/A',
+                type: 'Overall Total Result'
+            }, 'overallResultContainer');
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  CREDIT HOURS
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        function initCreditSubjects() {
+            if (document.getElementById('creditSubjectsContainer').children.length === 0) {
+                for (let i = 0; i < 4; i++) addCreditSubject();
+            }
+        }
+
+        function addCreditSubject() {
+            creditSubjectsCount++;
+            const container = document.getElementById('creditSubjectsContainer');
+            const entry = document.createElement('div');
+            entry.className = 'subject-entry';
+            entry.innerHTML = `
+                <div class="subject-header">
+                    <span class="subject-number">Subject ${creditSubjectsCount}</span>
+                    <button class="btn-danger" onclick="this.parentElement.parentElement.remove()"><i class="fas fa-times"></i> Remove</button>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
+                    <div class="input-group"><label>Credit Hours</label><input type="number" class="ch-credit" placeholder="e.g., 3" /></div>
+                    <div class="input-group"><label>Total Marks</label><input type="number" class="ch-total" placeholder="e.g., 100" /></div>
+                    <div class="input-group"><label>Obtain Marks</label><input type="number" class="ch-obtain" placeholder="e.g., 85" /></div>
+                </div>
+            `;
+            container.appendChild(entry);
+        }
+
+        function calculateCreditHours() {
+            const name = document.getElementById('chName').value || 'Student';
+            const prog = document.getElementById('chProgram').value || 'BS Program';
+            const credits = document.querySelectorAll('.ch-credit');
+            const totals = document.querySelectorAll('.ch-total');
+            const obtains = document.querySelectorAll('.ch-obtain');
+
+            let weightedGP = 0,
+                totalCredits = 0,
+                gTotal = 0,
+                gObtain = 0,
+                valid = 0;
+
+            for (let i = 0; i < credits.length; i++) {
+                const cr = parseFloat(credits[i].value);
+                const tm = parseFloat(totals[i].value);
+                const om = parseFloat(obtains[i].value);
+                if (!isNaN(cr) && !isNaN(tm) && !isNaN(om) && tm > 0 && cr > 0) {
+                    const pct = (om / tm) * 100;
+                    const info = getGrade(pct);
+                    weightedGP += info.gpa * cr;
+                    totalCredits += cr;
+                    gTotal += tm;
+                    gObtain += om;
+                    valid++;
+                }
+            }
+
+            if (valid === 0) {
+                showToast('⚠️ Please fill at least one subject!', true);
+                return;
+            }
+
+            const cgpa = totalCredits > 0 ? weightedGP / totalCredits : 0;
+            const pct = gTotal > 0 ? (gObtain / gTotal) * 100 : 0;
+            const gradeInfo = getGrade(pct);
+
+            displayResult({
+                studentName: name,
+                programName: prog,
+                cgpa,
+                percentage: pct,
+                grade: gradeInfo,
+                totalMarks: gTotal,
+                obtainMarks: gObtain,
+                totalSubjects: valid,
+                semestersCount: 'N/A',
+                type: 'Credit Hours Weighted CGPA',
+                totalCredits
+            }, 'creditResultContainer');
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  DISPLAY RESULT (Certificate style)
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        function displayResult(data, containerId) {
+            const gradeClass = getGradeClass(data.grade.letter);
+            const container = document.getElementById(containerId);
+
+            let extra = '';
+            if (data.totalCredits) {
+                extra = `
+                    <div class="result-item">
+                        <div class="label">Total Credit Hours</div>
+                        <div class="value gold">${data.totalCredits}</div>
+                    </div>`;
+            }
+
+            container.innerHTML = `
+                <div class="result-card" id="resultCard-${containerId}">
+                    <div class="certificate-border"></div>
+                    <div class="watermark">AzeemAiOUPrime</div>
+                    <div class="result-content">
+                        <div class="result-header">
+                            <div class="uni-name"><i class="fas fa-university"></i> ALLAMA IQBAL OPEN UNIVERSITY</div>
+                            <div class="brand-sub">✦ AzeemAiOUPrime • AIOU CGPA Calculator ✦</div>
+                            <div class="result-type">${data.type}</div>
+                        </div>
+                        <div class="result-student">
+                            <div class="student-name"><i class="fas fa-user-graduate" style="color:var(--accent-1);margin-right:8px;"></i>${data.studentName}</div>
+                            <div class="student-program"><i class="fas fa-book" style="color:var(--accent-2);margin-right:6px;"></i>${data.programName}</div>
+                        </div>
+                        <div class="result-grid">
+                            <div class="result-item">
+                                <div class="label">CGPA / GPA</div>
+                                <div class="value">${data.cgpa.toFixed(2)}</div>
+                            </div>
+                            <div class="result-item">
+                                <div class="label">Percentage</div>
+                                <div class="value gold">${data.percentage.toFixed(2)}%</div>
+                            </div>
+                            <div class="result-item">
+                                <div class="label">Total Marks</div>
+                                <div class="value">${data.totalMarks}</div>
+                            </div>
+                            <div class="result-item">
+                                <div class="label">Obtain Marks</div>
+                                <div class="value green">${data.obtainMarks}</div>
+                            </div>
+                            ${extra}
+                            <div class="result-item">
+                                <div class="label">Subjects</div>
+                                <div class="value">${data.totalSubjects}</div>
+                            </div>
+                            <div class="result-item" style="grid-column:1/-1;text-align:center;padding:8px;">
+                                <div class="label">Grade</div>
+                                <div class="grade-badge ${gradeClass}">${data.grade.letter}</div>
+                            </div>
+                        </div>
+                        <div class="watermark-footer">
+                            <span class="wm-brand">✦ AzeemAiOUPrime ✦</span>
+                            <span><i class="fas fa-phone" style="color:var(--accent-1);"></i> 0334-1967215</span>
+                            <span style="font-size:9px;"><i class="fab fa-whatsapp" style="color:#25d366;"></i> WhatsApp Channel • AIOU Official</span>
+                            <span style="font-size:8px;opacity:0.5;">© ${new Date().getFullYear()} AzeemAiOUPrime</span>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn-save-image" onclick="saveResultAsImage('resultCard-${containerId}')"><i class="fas fa-image"></i> Save as Image</button>
+                            <button class="btn-print" onclick="printResult('resultCard-${containerId}')"><i class="fas fa-print"></i> Print / PDF</button>
+                            <button class="btn btn-secondary" onclick="navigateTo('dashboard')" style="flex:0.4;"><i class="fas fa-home"></i> Home</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Scroll to result
+            const mainContent = document.getElementById('mainContent');
+            setTimeout(() => {
+                container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+
+            showToast('✅ Result Generated Successfully!');
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  SAVE AS IMAGE (using html2canvas)
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        function saveResultAsImage(cardId) {
+            const card = document.getElementById(cardId);
+            if (!card) {
+                showToast('⚠️ Result not found!', true);
+                return;
+            }
+
+            // Show loading toast
+            showToast('⏳ Generating image...');
+
+            // Use html2canvas to capture the card with high quality
+            html2canvas(card, {
+                scale: 2.5, // high resolution
+                backgroundColor: '#0a0a1a',
+                allowTaint: false,
+                useCORS: true,
+                logging: false,
+                borderRadius: '20px',
+                onclone: function(doc) {
+                    // Ensure the watermark is visible in the clone
+                    const watermark = doc.querySelector('.watermark');
+                    if (watermark) {
+                        watermark.style.opacity = '0.06';
+                    }
+                }
+            }).then(canvas => {
+                // Create download link
+                const link = document.createElement('a');
+                link.download = `AzeemAiOUPrime_Result_${new Date().getTime()}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                showToast('✅ Image saved successfully!');
+            }).catch(err => {
+                console.error(err);
+                showToast('⚠️ Failed to save image. Please try again.', true);
+            });
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  PRINT
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        function printResult(cardId) {
+            const card = document.getElementById(cardId);
+            if (!card) return;
+            const original = document.body.innerHTML;
+            // Create a clone to avoid affecting the main page
+            const clone = card.cloneNode(true);
+            // Remove action buttons from clone for print
+            const actions = clone.querySelector('.action-buttons');
+            if (actions) actions.remove();
+            document.body.innerHTML = `
+                <div style="display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px;background:#fff;">
+                    ${clone.outerHTML}
+                </div>
+            `;
+            setTimeout(() => {
+                window.print();
+                location.reload();
+            }, 300);
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  INIT
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        document.addEventListener('DOMContentLoaded', () => {
+            buildSemesterUI();
+            initCreditSubjects();
+            navigateTo('dashboard');
+
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', (e) => {
+                if (window.innerWidth <= 768) {
+                    const sidebar = document.getElementById('sidebar');
+                    if (!sidebar.contains(e.target) && !e.target.closest('.hamburger')) {
+                        closeSidebar();
+                    }
+                }
+            });
+
+            // Keyboard shortcut: ESC to close sidebar
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeSidebar();
+            });
+
+            console.log('✅ AzeemAiOUPrime v2.0 - AIOU CGPA Calculator');
+            console.log('📞 0334-1967215');
+            console.log('🚀 Ready!');
+        });
+    </script>
+</body>
+  </html>
